@@ -1,0 +1,1 @@
+export { useMainHook } from './useMainHook';

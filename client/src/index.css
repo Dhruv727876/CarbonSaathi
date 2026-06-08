@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Noto Sans', sans-serif;
+    @apply text-gray-800 bg-gray-50;
+  }
+  h1 {
+    @apply text-3xl font-bold text-gray-900;
+  }
+  /* Strict A11y Focus States */
+  *:focus-visible {
+    outline: 2px solid #f97316 !important;
+    outline-offset: 2px !important;
+  }
+  /* Enforce minimum text contrast */
+  .text-contrast-safe {
+    @apply text-gray-700; 
+  }
+}
+
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
