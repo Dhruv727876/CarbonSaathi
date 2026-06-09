@@ -48,7 +48,7 @@ async function executeGemmaQuery(message, personaId) {
     throw new Error('NVIDIA_API_KEY is not configured in the environment.');
   }
 
-  if (process.env.NVIDIA_API_KEY === 'mock_nvidia_api_key_for_testing') {
+  if (process.env.NODE_ENV === 'test' || process.env.NVIDIA_API_KEY === 'mock_nvidia_api_key_for_testing') {
     return {
       responseText: `Processed message: ${message}. Source: moef.gov.in`,
       suggestedAction: "Reduce daily electricity usage by 10%.",
@@ -117,7 +117,7 @@ async function executeMythBust(myth) {
     throw new Error('NVIDIA_API_KEY is not configured in the environment.');
   }
 
-  if (process.env.NVIDIA_API_KEY === 'mock_nvidia_api_key_for_testing') {
+  if (process.env.NODE_ENV === 'test' || process.env.NVIDIA_API_KEY === 'mock_nvidia_api_key_for_testing') {
     return {
       responseText: `Myth evaluation: Myth analyzed. Source: moef.gov.in`,
       suggestedAction: "Consult the official MoEFCC guidelines on carbon statistics.",

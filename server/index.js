@@ -31,16 +31,27 @@ app.use(helmet.contentSecurityPolicy({
   }
 }));
 
-// 2. Hardcoded CORS
-const allowedOrigins = ['http://localhost:3000', 'https://carbonsaathi-prod-98.web.app'];
+// 2. Dynamic CORS configuration
+const whitelist = [
+  'http://localhost:3000',
+  'https://carbonsaathi-prod-98.web.app',
+  'https://carbonsaathi-prod-98.firebaseapp.com'
+];
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (
+      !origin || 
+      whitelist.includes(origin) || 
+      origin.endsWith('.web.app') || 
+      origin.endsWith('.firebaseapp.com')
+    ) {
       callback(null, true);
     } else {
       callback(new Error('CORS policy violation.'));
     }
-  }
+  },
+  credentials: true
 }));
 
 app.use(express.json({ limit: '50kb' }));
