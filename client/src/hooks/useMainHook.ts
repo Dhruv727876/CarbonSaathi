@@ -6,8 +6,8 @@ import { log } from '../utils/logger';
 
 interface UseMainHookReturn {
   messages: Message[];
-  selectedPersona: string;
-  setSelectedPersona: (personaId: string) => void;
+  selectedPersona: string | null;
+  setSelectedPersona: (personaId: string | null) => void;
   isLoading: boolean;
   error: string | null;
   welcomeBack: boolean;
@@ -17,7 +17,7 @@ interface UseMainHookReturn {
 
 export const useMainHook = (): UseMainHookReturn => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedPersona, setSelectedPersona] = useState<string>('citizen');
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [welcomeBack, setWelcomeBack] = useState<boolean>(false);
@@ -118,7 +118,7 @@ export const useMainHook = (): UseMainHookReturn => {
     syncToFirestore(updatedMessages);
 
     try {
-      const activePersonaId = personaId || selectedPersona;
+      const activePersonaId = personaId || selectedPersona || 'citizen';
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
