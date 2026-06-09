@@ -60,7 +60,7 @@ async function executeGemmaQuery(message, personaId) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
     controller.abort();
-  }, 25000);
+  }, 60000);
 
   try {
     const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
