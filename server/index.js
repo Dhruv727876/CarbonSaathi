@@ -1,8 +1,5 @@
-// Temporarily hardcode variables to bypass Windows encoding bugs
-process.env.PORT = 5000;
-process.env.NVIDIA_API_KEY = "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";
+require('dotenv').config();
 
-console.log("✅ DEBUG: Forcing API Key into environment...");
 const functions = require('firebase-functions');
 const express = require('express');
 const helmet = require('helmet');
@@ -103,3 +100,11 @@ app.use((err, req, res, next) => {
 // Export Express app for testing and Firebase Functions
 module.exports = app;
 module.exports.api = functions.https.onRequest(app);
+
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+      console.log(`🚀 Server is awake and listening on port ${PORT}`);
+  });
+}
+
