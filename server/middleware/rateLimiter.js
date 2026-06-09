@@ -1,27 +1,26 @@
-const rateLimitMap = new Map();
+const rateLimit = require('express-rate-limit');
 
-/**
- * Clean primitive modular memory rate limiter bypassing structural external dependencies.
- * @param maxRequests - Limit window boundary threshold.
- * @returns Function Express middleware implementation.
- */
-module.exports = function createLimiter(maxRequests) {
-  return (req, res, next) => {
-    const ip = req.ip;
-    const now = Date.now();
-    const windowMs = 60000;
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+});
 
-    if (!rateLimitMap.has(ip)) {
-      rateLimitMap.set(ip, []);
-    }
+const mythLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+});
 
-    const timestamps = rateLimitMap.get(ip).filter(time => now - time < windowMs);
-    timestamps.push(now);
-    rateLimitMap.set(ip, timestamps);
-
-    if (timestamps.length > maxRequests) {
-      return res.status(429).json({ error: 'Too many execution operations requests.' });
-    }
-    next();
-  };
+module.exports = {
+  chatLimiter,
+  mythLimiter
 };

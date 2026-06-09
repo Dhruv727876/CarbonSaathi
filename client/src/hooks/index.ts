@@ -1,1 +1,3 @@
-export { useMainHook } from './useMainHook';
+import useMainHook from './useMainHook';
+export { useMainHook };
+export default useMainHook;

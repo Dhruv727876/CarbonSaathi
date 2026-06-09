@@ -2,18 +2,20 @@ const functions = require('firebase-functions');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const xss = require('xss');
-const rateLimit = require('express-rate-limit');
-const { body, validationResult } = require('express-validator');
-const { executeGemmaQuery } = require('./services/gemmaService');
+const { chatLimiter, mythLimiter } = require('./middleware/rateLimiter');
+const { validateChat, validateMythbust } = require('./middleware/validateInput');
+const { executeGemmaQuery, executeMythBust } = require('./services/gemmaService');
 
-// Firebase automatically loads the .env file in the same directory during deployment
-const requiredEnvVars = ['NVIDIA_API_KEY'];
-requiredEnvVars.forEach(envVar => {
-  if (process.env.NODE_ENV === 'production' && !process.env[envVar]) {
-    console.error(`CRITICAL: Missing required environment variable: ${envVar}`);
-  }
-});
+// For Jest testing, mock NVIDIA_API_KEY if not already present
+if (process.env.NODE_ENV === 'test') {
+  process.env.NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || 'mock_nvidia_api_key_for_testing';
+}
+
+// Startup ENV validation block
+if (!process.env.NVIDIA_API_KEY) {
+  process.stderr.write('CRITICAL CONFIGURATION ERROR: NVIDIA_API_KEY is not configured in the environment.\n');
+  process.exit(1);
+}
 
 const app = express();
 
@@ -40,48 +42,20 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '50kb' }));
-
-// 3. Strict Rate Limiters (Trust proxy required for Firebase Functions)
 app.set('trust proxy', 1);
-const chatLimiter = rateLimit({ windowMs: 60000, max: 20, message: { error: 'Chat rate limit exceeded.' } });
-const mythLimiter = rateLimit({ windowMs: 60000, max: 15, message: { error: 'Mythbust rate limit exceeded.' } });
-
-// 4. Input Sanitization Wrapper
-const sanitizePayload = (req, res, next) => {
-  if (req.body && req.body.message) {
-    req.body.message = xss(req.body.message);
-  }
-  next();
-};
 
 // --- ROUTES ---
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'operational', timestamp: Date.now() });
 });
 
-const ALLOWED_PERSONAS = ['coach', 'auditor', 'investor', 'debunker'];
-
-app.post('/api/chat', 
+app.post('/api/chat',
   chatLimiter,
-  [
-    body('message').isString().trim().notEmpty().isLength({ max: 1000 }).withMessage('Message must be 1-1000 characters.'),
-    body('personaId').isIn(ALLOWED_PERSONAS).withMessage('Invalid persona selected.')
-  ],
-  sanitizePayload,
+  validateChat,
   async (req, res, next) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ error: 'Payload validation failed.', details: errors.array() });
-      }
-
       const { message, personaId } = req.body;
-
-      const aiExecution = executeGemmaQuery(message, personaId);
-      const timeoutEngine = new Promise((_, reject) => setTimeout(() => reject(new Error('AI_TIMEOUT')), 25000));
-
-      const aiResponse = await Promise.race([aiExecution, timeoutEngine]);
-      
+      const aiResponse = await executeGemmaQuery(message, personaId);
       res.status(200).json(aiResponse);
     } catch (error) {
       next(error);
@@ -91,34 +65,36 @@ app.post('/api/chat',
 
 app.post('/api/mythbust',
   mythLimiter,
-  [
-    body('myth').isString().trim().notEmpty().isLength({ max: 500 })
-  ],
-  sanitizePayload,
+  validateMythbust,
   async (req, res, next) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) return res.status(400).json({ error: 'Invalid myth payload.' });
-
-      res.status(200).json({ truth: 'Fact-checked by CarbonSaathi metrics.', sources: ['moef.gov.in'] });
+      const { myth } = req.body;
+      const aiResponse = await executeMythBust(myth);
+      res.status(200).json(aiResponse);
     } catch (error) {
       next(error);
     }
   }
 );
 
-// 5. 404 & Error Handlers
+// 404 Handler for unmatched routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Requested endpoint does not exist.' });
 });
 
+// Global Error Handler
 app.use((err, req, res, next) => {
-  const isDev = process.env.NODE_ENV !== 'production';
   if (err.message === 'AI_TIMEOUT') {
     return res.status(504).json({ error: 'AI processing timeout exceeded.' });
   }
-  res.status(500).json({ error: 'Internal system operations failure.', details: isDev ? err.message : undefined });
+
+  if (err.message === 'CORS policy violation.') {
+    return res.status(400).json({ error: 'CORS policy violation.' });
+  }
+
+  res.status(500).json({ error: 'Internal system operations failure.' });
 });
 
-// EXPORT AS FIREBASE HTTP FUNCTION
-exports.api = functions.https.onRequest(app);
+// Export Express app for testing and Firebase Functions
+module.exports = app;
+module.exports.api = functions.https.onRequest(app);

@@ -1,60 +1,209 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Message } from '../types';
+import { db, initializeUserSession } from '../firebase';
 import { log } from '../utils/logger';
 
 interface UseMainHookReturn {
   messages: Message[];
+  selectedPersona: string;
+  setSelectedPersona: (personaId: string) => void;
   isLoading: boolean;
   error: string | null;
-  sendMessage: (text: string, personaId: string) => Promise<void>;
+  welcomeBack: boolean;
+  sendMessage: (text: string, personaId?: string) => Promise<void>;
+  bustMyth: (myth: string) => Promise<void>;
 }
 
 export const useMainHook = (): UseMainHookReturn => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedPersona, setSelectedPersona] = useState<string>('citizen');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Debounce ref for Efficiency score (simulating delayed Firestore sync)
+  const [welcomeBack, setWelcomeBack] = useState<boolean>(false);
+  const [uid, setUid] = useState<string | null>(null);
+
+  const hasLoaded = useRef<boolean>(false);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const sendMessage = useCallback(async (text: string, personaId: string): Promise<void> => {
+  // Memoized message stream - clean any potential HTML tags or duplicate entries
+  const cleanMessages = useMemo(() => {
+    return messages.map(msg => ({
+      ...msg,
+      text: msg.text.replace(/<[^>]*>/g, '') // strip HTML/XML tags
+    }));
+  }, [messages]);
+
+  // Handle user session initialization
+  useEffect(() => {
+    let active = true;
+    initializeUserSession()
+      .then(async (userUid) => {
+        if (!active) return;
+        setUid(userUid);
+
+        // Load historical chat from Firestore exactly once
+        if (!hasLoaded.current) {
+          hasLoaded.current = true;
+          try {
+            const userDocRef = doc(db, 'users', userUid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const data = userDocSnap.data();
+              if (data && Array.isArray(data.messages) && data.messages.length > 0) {
+                setMessages(data.messages as Message[]);
+                setWelcomeBack(true);
+                // Reset welcomeBack indicator after 5 seconds
+                setTimeout(() => setWelcomeBack(false), 5000);
+              }
+            }
+          } catch (err) {
+            log('Firestore load error:', err);
+            setError(err instanceof Error ? err.message : 'Failed to recover user history');
+          }
+        }
+      })
+      .catch((err) => {
+        if (!active) return;
+        log('Session init error:', err);
+        setError(err instanceof Error ? err.message : 'Auth initialization failure');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Background sync helper
+  const syncToFirestore = useCallback((currentMessages: Message[]) => {
+    if (!uid) return;
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    syncTimeoutRef.current = setTimeout(async () => {
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        await setDoc(userDocRef, { messages: currentMessages }, { merge: true });
+        log('Firestore sync successfully executed.');
+      } catch (err) {
+        log('Firestore sync error:', err);
+        setError(err instanceof Error ? err.message : 'Database sync failed');
+      }
+    }, 2000);
+  }, [uid]);
+
+  // Clean up timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Send message callback
+  const sendMessage = useCallback(async (text: string, personaId?: string): Promise<void> => {
     setIsLoading(true);
     setError(null);
-    
-    const userMsg: Message = { id: Date.now().toString(), sender: 'user', text, timestamp: Date.now() };
-    setMessages((prev) => [...prev, userMsg]);
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text,
+      timestamp: Date.now()
+    };
+
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    syncToFirestore(updatedMessages);
 
     try {
-      // Efficiency: Debounced DB sync logic
-      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
-      syncTimeoutRef.current = setTimeout(() => {
-        log('Debounced sync to Firestore executed.');
-      }, 2000);
-
+      const activePersonaId = personaId || selectedPersona;
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, personaId })
+        body: JSON.stringify({ message: text, personaId: activePersonaId })
       });
 
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-      const aiMsg: Message = { 
-        id: (Date.now() + 1).toString(), 
-        sender: 'ai', 
-        text: data.responseText || 'Error processing response.', 
-        timestamp: Date.now() 
+      const data = await response.json();
+      const aiMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: data.responseText || 'Error processing response.',
+        timestamp: Date.now()
       };
-      
-      setMessages((prev) => [...prev, aiMsg]);
+
+      const finalMessages = [...updatedMessages, aiMsg];
+      setMessages(finalMessages);
+      syncToFirestore(finalMessages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
       log('Chat Error:', err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [messages, selectedPersona, syncToFirestore]);
 
-  return { messages, isLoading, error, sendMessage };
+  // Myth bust callback
+  const bustMyth = useCallback(async (myth: string): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: `Bust Myth: ${myth}`,
+      timestamp: Date.now()
+    };
+
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    syncToFirestore(updatedMessages);
+
+    try {
+      const response = await fetch('/api/mythbust', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ myth })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      const aiMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: data.responseText || `Fact Check Result: ${data.truth || 'Verified by CarbonSaathi.'}`,
+        timestamp: Date.now()
+      };
+
+      const finalMessages = [...updatedMessages, aiMsg];
+      setMessages(finalMessages);
+      syncToFirestore(finalMessages);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      log('Mythbust Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [messages, syncToFirestore]);
+
+  return {
+    messages: cleanMessages,
+    selectedPersona,
+    setSelectedPersona,
+    isLoading,
+    error,
+    welcomeBack,
+    sendMessage,
+    bustMyth
+  };
 };
+
+export default useMainHook;

@@ -6,10 +6,36 @@ export interface Message {
 }
 
 export interface Persona {
-  id: 'coach' | 'auditor' | 'investor' | 'debunker';
+  id: 'innovator' | 'skeptic' | 'policy_maker' | 'citizen' | 'coach' | 'auditor' | 'investor' | 'debunker';
   name: string;
   role: string;
   description: string;
+}
+
+export type ElectionStage = 'pre_election' | 'active_voting' | 'post_election';
+
+export interface ReadinessAnswer {
+  questionId: string;
+  optionIndex: number;
+  pointsReceived: number;
+}
+
+export interface GroundingChunk {
+  chunkId: string;
+  sourceUri: string;
+  snippet: string;
+}
+
+export interface GroundingMetadata {
+  chunks: GroundingChunk[];
+  confidenceScore: number;
+}
+
+export interface ChatResponse {
+  responseText: string;
+  suggestedAction: string;
+  sources: string[];
+  grounding?: GroundingMetadata;
 }
 
 export interface EmissionLog {
@@ -23,7 +49,7 @@ export interface EmissionLog {
 export interface QuizQuestion {
   id: string;
   question: string;
-  options: string[];
+  options: readonly string[];
   points: number;
 }
 
@@ -32,10 +58,5 @@ export interface UserProgress {
   totalEmissionsSavedKg: number;
   quizScore: number;
   lastActiveTimestamp: number;
-}
-
-export interface ChatResponse {
-  responseText: string;
-  suggestedAction: string;
-  sources: string[];
+  readinessAnswers: ReadinessAnswer[];
 }
