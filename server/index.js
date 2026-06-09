@@ -66,12 +66,17 @@ app.post('/api/chat',
   chatLimiter,
   validateChat,
   async (req, res, next) => {
+    if (!process.env.NVIDIA_API_KEY) {
+      return res.status(500).json({ error: "NVIDIA API Key is missing from the server environment setup." });
+    }
+
     try {
       const { message, personaId } = req.body;
       const aiResponse = await executeGemmaQuery(message, personaId);
       res.status(200).json(aiResponse);
     } catch (error) {
-      next(error);
+      console.error("Backend Error:", error.message);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
   }
 );
