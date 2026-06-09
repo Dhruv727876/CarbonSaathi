@@ -1,3 +1,8 @@
+// Temporarily hardcode variables to bypass Windows encoding bugs
+process.env.PORT = 5000;
+process.env.NVIDIA_API_KEY = "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";
+
+console.log("✅ DEBUG: Forcing API Key into environment...");
 const functions = require('firebase-functions');
 const express = require('express');
 const helmet = require('helmet');
