@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { ErrorBoundary } from './components';
 import { useMainHook } from './hooks';
 import { COMMON_MYTHS } from './constants';
+import './index.css';
 
 // Dynamic imports for optimized loading performance
 const PersonaSelector = React.lazy(() => import('./components/PersonaSelector').then(m => ({ default: m.PersonaSelector })));
