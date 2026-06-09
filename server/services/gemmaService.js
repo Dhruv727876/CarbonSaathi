@@ -71,7 +71,7 @@ async function executeGemmaQuery(message, personaId) {
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'google/gemma-2-2b-it',
+        model: "google/gemma-4-31b-it",
         messages: [
           { role: 'system', content: systemInstruction },
           { role: 'user', content: message }
@@ -161,7 +161,7 @@ RESPONSE FORMAT (Strictly enforce this structure):
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'google/gemma-2-2b-it',
+        model: "google/gemma-4-31b-it",
         messages: [
           { role: 'system', content: systemInstruction },
           { role: 'user', content: myth }
