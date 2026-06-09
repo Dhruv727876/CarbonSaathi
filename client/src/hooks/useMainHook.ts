@@ -119,7 +119,8 @@ export const useMainHook = (): UseMainHookReturn => {
 
     try {
       const activePersonaId = personaId || selectedPersona || 'citizen';
-      const response = await fetch('/api/chat', {
+      const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, personaId: activePersonaId })
@@ -165,7 +166,8 @@ export const useMainHook = (): UseMainHookReturn => {
     syncToFirestore(updatedMessages);
 
     try {
-      const response = await fetch('/api/mythbust', {
+      const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${baseUrl}/api/mythbust`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ myth })
