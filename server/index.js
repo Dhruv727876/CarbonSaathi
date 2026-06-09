@@ -75,8 +75,8 @@ app.post('/api/chat',
       const aiResponse = await executeGemmaQuery(message, personaId);
       res.status(200).json(aiResponse);
     } catch (error) {
-      console.error("Backend Error:", error.message);
-      res.status(500).json({ error: "Internal Server Error", details: error.message });
+      if (process.env.NODE_ENV !== "production") console.error("Backend Error:", error.message);
+      next(error);
     }
   }
 );

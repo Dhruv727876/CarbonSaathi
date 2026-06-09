@@ -28,10 +28,14 @@ export const useMainHook = (): UseMainHookReturn => {
 
   // Memoized message stream - clean any potential HTML tags or duplicate entries
   const cleanMessages = useMemo(() => {
-    return messages.map(msg => ({
-      ...msg,
-      text: msg.text.replace(/<[^>]*>/g, '') // strip HTML/XML tags
-    }));
+    return messages.map(msg => {
+      const doc = new DOMParser().parseFromString(msg.text, "text/html");
+      const cleanText = doc.body.textContent || "";
+      return {
+        ...msg,
+        text: cleanText
+      };
+    });
   }, [messages]);
 
   // Handle user session initialization

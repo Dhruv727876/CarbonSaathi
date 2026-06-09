@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAnalytics, logEvent } from 'firebase/analytics';
 
 const firebaseConfig = {
@@ -16,6 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch((err) => { if (process.env.NODE_ENV !== "production") console.warn("Firebase persistence error:", err.code); });
 export const analytics = getAnalytics(app);
 
 export { doc, setDoc, getDoc };
