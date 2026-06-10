@@ -8,6 +8,11 @@ interface ChatInterfaceProps {
   onSendMessage: (text: string) => void;
 }
 
+/**
+ * Chat interface component for AI-powered carbon conversations.
+ * @param props - ChatInterfaceProps
+ * @returns JSX chat interface element.
+ */
 export const ChatInterface: React.FC<ChatInterfaceProps> = React.memo(({ messages, isLoading, error, onSendMessage }) => {
   const [input, setInput] = useState('');
 

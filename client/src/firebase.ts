@@ -14,9 +14,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+/** Firebase Authentication instance. */
 export const auth = getAuth(app);
+
+/** Firebase Firestore database instance. */
 export const db = getFirestore(app);
 enableIndexedDbPersistence(db).catch((err) => { if (process.env.NODE_ENV !== "production") console.warn("Firebase persistence error:", err.code); });
+
+/** Firebase Analytics instance. */
 export const analytics = getAnalytics(app);
 
 export { doc, setDoc, getDoc };

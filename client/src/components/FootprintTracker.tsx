@@ -13,6 +13,11 @@ interface LogEntry {
   totalCo2: number;
 }
 
+/**
+ * Daily carbon footprint logging component with Firestore persistence.
+ * @param props - FootprintTrackerProps
+ * @returns JSX footprint tracker form element.
+ */
 export const FootprintTracker: React.FC<FootprintTrackerProps> = ({ uid }) => {
   const [carKm, setCarKm] = useState<number>(0);
   const [flightKm, setFlightKm] = useState<number>(0);

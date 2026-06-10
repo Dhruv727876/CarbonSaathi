@@ -12,6 +12,11 @@ interface MythBusterProps {
   onBustMyth: (myth: string) => void;
 }
 
+/**
+ * Carbon myth fact-checking component powered by AI.
+ * @param props - MythBusterProps
+ * @returns JSX myth buster element.
+ */
 export const MythBuster: React.FC<MythBusterProps> = React.memo(({ myths, onBustMyth }) => {
   return (
     <section role="region" aria-label="Climate Myth Buster Section" className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mt-6">

@@ -16,6 +16,11 @@ interface DBLogData {
   totalCo2?: number;
 }
 
+/**
+ * Weekly emissions reduction dashboard with personalized tips.
+ * @param props - ReductionDashboardProps
+ * @returns JSX reduction dashboard element.
+ */
 export const ReductionDashboard: React.FC<ReductionDashboardProps> = ({ uid }) => {
   const [totalThisWeek, setTotalThisWeek] = useState<number>(0);
   const [percentChange, setPercentChange] = useState<number>(0);

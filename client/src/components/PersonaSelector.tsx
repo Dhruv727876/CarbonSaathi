@@ -14,6 +14,11 @@ const personaEmojis: Record<string, string> = {
   citizen: '🏡'
 };
 
+/**
+ * Persona selection component with keyboard navigation support.
+ * @param props - PersonaSelectorProps
+ * @returns JSX persona selector element.
+ */
 export const PersonaSelector: React.FC<PersonaSelectorProps> = React.memo(({ selectedPersona, onSelect }) => {
   const primaryPersonas = ALLOWED_PERSONAS.filter((p): p is Persona & { id: 'innovator' | 'skeptic' | 'policy_maker' | 'citizen' } => 
     ['innovator', 'skeptic', 'policy_maker', 'citizen'].includes(p.id)

@@ -1,5 +1,6 @@
 import { Persona, QuizQuestion, ActivityCategory } from '../types';
 
+/** List of valid AI persona identifiers. */
 export const ALLOWED_PERSONAS: readonly Persona[] = [
   { id: 'innovator', name: 'Eco-Innovator', role: 'Clean Tech & Decarbonization', description: 'Focuses on disruptive technologies and green tech startups.' },
   { id: 'skeptic', name: 'Climate Skeptic', role: 'Empirical Audit', description: 'Demands hard math, ROI payback periods, and verified emissions data.' },
@@ -11,12 +12,14 @@ export const ALLOWED_PERSONAS: readonly Persona[] = [
   { id: 'debunker', name: 'Myth-Buster', role: 'Scientific Truth Verification', description: 'Deconstructs systemic climate myths.' }
 ] as const;
 
+/** Carbon action stages for user journey. */
 export const ELECTION_STAGES = {
   PRE_ELECTION: 'pre_election',
   ACTIVE_VOTING: 'active_voting',
   POST_ELECTION: 'post_election'
 } as const;
 
+/** Common carbon footprint myths for fact-checking. */
 export const COMMON_MYTHS = [
   {
     id: 'm1',
@@ -32,12 +35,14 @@ export const COMMON_MYTHS = [
   }
 ] as const;
 
+/** API endpoint paths for backend communication. */
 export const API_ENDPOINTS = {
   CHAT: '/api/chat',
   MYTHBUST: '/api/mythbust',
   HEALTH: '/api/health'
 } as const;
 
+/** Suggested prompts per persona type. */
 export const PERSONA_SUGGESTIONS = {
   innovator: [
     'How do direct air capture startups scale?',
@@ -73,6 +78,7 @@ export const PERSONA_SUGGESTIONS = {
   ]
 } as const;
 
+/** User readiness assessment questions. */
 export const READINESS_QUESTIONS: readonly QuizQuestion[] = [
   {
     id: 'q1',
@@ -88,6 +94,7 @@ export const READINESS_QUESTIONS: readonly QuizQuestion[] = [
   }
 ] as const;
 
+/** Emission factors in kg CO₂ per unit by activity. */
 export const EMISSION_FACTORS = {
   car_km: 0.17,
   flight_km: 0.25,
@@ -95,6 +102,7 @@ export const EMISSION_FACTORS = {
   electricity_kwh: 0.82
 } as const;
 
+/** Personalized reduction tips keyed by activity category. */
 export const REDUCTION_TIPS: Record<string, string[]> = {
   transport: [
     "Switch to public transit or electric vehicles where possible.",
@@ -118,6 +126,7 @@ export const REDUCTION_TIPS: Record<string, string[]> = {
   ]
 };
 
+/** Activity categories with emission calculation metadata. */
 export const ACTIVITY_CATEGORIES: ActivityCategory[] = [
   { id: 'transport', label: 'Car Commute', unit: 'km', emissionFactor: 0.21 },
   { id: 'flight', label: 'Flight Travel', unit: 'km', emissionFactor: 0.255 },
