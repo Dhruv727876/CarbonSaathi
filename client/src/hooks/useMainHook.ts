@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Message } from '../types';
-import { db, initializeUserSession } from '../firebase';
+import { db, initializeUserSession, logCarbonEvent, doc, getDoc, setDoc } from '../firebase';
 import { log } from '../utils/logger';
 
 interface UseMainHookReturn {
@@ -13,6 +12,7 @@ interface UseMainHookReturn {
   welcomeBack: boolean;
   sendMessage: (text: string, personaId?: string) => Promise<void>;
   bustMyth: (myth: string) => Promise<void>;
+  uid: string | null;
 }
 
 export const useMainHook = (): UseMainHookReturn => {
@@ -25,6 +25,13 @@ export const useMainHook = (): UseMainHookReturn => {
 
   const hasLoaded = useRef<boolean>(false);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSetSelectedPersona = useCallback((personaId: string | null) => {
+    setSelectedPersona(personaId);
+    if (personaId) {
+      logCarbonEvent('persona_selected', { persona_id: personaId });
+    }
+  }, []);
 
   // Memoized message stream - clean any potential HTML tags or duplicate entries
   const cleanMessages = useMemo(() => {
@@ -57,9 +64,14 @@ export const useMainHook = (): UseMainHookReturn => {
               if (data && Array.isArray(data.messages) && data.messages.length > 0) {
                 setMessages(data.messages as Message[]);
                 setWelcomeBack(true);
+                logCarbonEvent('session_restored');
                 // Reset welcomeBack indicator after 5 seconds
                 setTimeout(() => setWelcomeBack(false), 5000);
+              } else {
+                logCarbonEvent('app_loaded');
               }
+            } else {
+              logCarbonEvent('app_loaded');
             }
           } catch (err) {
             log('Firestore load error:', err);
@@ -107,8 +119,20 @@ export const useMainHook = (): UseMainHookReturn => {
 
   // Send message callback
   const sendMessage = useCallback(async (text: string, personaId?: string): Promise<void> => {
+    if (!text || !text.trim()) {
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
+
+    logCarbonEvent('chat_message_sent');
+    if (text.toLowerCase().includes('commute') || text.toLowerCase().includes('energy') || text.toLowerCase().includes('waste')) {
+      logCarbonEvent('carbon_entry_logged', { category: 'general' });
+    }
+    if (text.toLowerCase().includes('quiz') || text.toLowerCase().includes('challenge')) {
+      logCarbonEvent('challenge_started');
+    }
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -158,6 +182,8 @@ export const useMainHook = (): UseMainHookReturn => {
     setIsLoading(true);
     setError(null);
 
+    logCarbonEvent('myth_checked', { myth_id: myth });
+
     const userMsg: Message = {
       id: Date.now().toString(),
       sender: 'user',
@@ -203,12 +229,13 @@ export const useMainHook = (): UseMainHookReturn => {
   return {
     messages: cleanMessages,
     selectedPersona,
-    setSelectedPersona,
+    setSelectedPersona: handleSetSelectedPersona,
     isLoading,
     error,
     welcomeBack,
     sendMessage,
-    bustMyth
+    bustMyth,
+    uid
   };
 };
 

@@ -87,3 +87,34 @@ export const READINESS_QUESTIONS: readonly QuizQuestion[] = [
     points: 15
   }
 ] as const;
+
+export const EMISSION_FACTORS = {
+  car_km: 0.17,
+  flight_km: 0.25,
+  beef_meal: 7.2,
+  electricity_kwh: 0.82
+} as const;
+
+export const REDUCTION_TIPS: Record<string, string[]> = {
+  transport: [
+    "Switch to public transit or electric vehicles where possible.",
+    "Carpool or combine errands to optimize route planning.",
+    "Maintain optimal tire pressure to ensure maximum fuel efficiency."
+  ],
+  food: [
+    "Opt for local, seasonal, and plant-based protein options.",
+    "Compost organic waste to mitigate landfill methane output.",
+    "Plan meals beforehand to reduce domestic food spoilage."
+  ],
+  energy: [
+    "Replace old lightbulbs with energy-efficient LED configurations.",
+    "Audit appliance BEE star ratings and select high-efficiency models.",
+    "Unplug idle electronics to prevent phantom energy draw."
+  ],
+  shopping: [
+    "Bring reusable bags and buy goods in bulk to reduce packaging waste.",
+    "Prioritize durable products over single-use alternatives.",
+    "Support brands that offer circular or return-to-loop programs."
+  ]
+};
+

@@ -8,6 +8,8 @@ import './index.css';
 const PersonaSelector = React.lazy(() => import('./components/PersonaSelector').then(m => ({ default: m.PersonaSelector })));
 const ChatInterface = React.lazy(() => import('./components/ChatInterface').then(m => ({ default: m.ChatInterface })));
 const MythBuster = React.lazy(() => import('./components/MythBuster').then(m => ({ default: m.MythBuster })));
+const FootprintTracker = React.lazy(() => import('./components/FootprintTracker').then(m => ({ default: m.FootprintTracker })));
+const ReductionDashboard = React.lazy(() => import('./components/ReductionDashboard').then(m => ({ default: m.ReductionDashboard })));
 
 const App: React.FC = () => {
   const { 
@@ -18,7 +20,8 @@ const App: React.FC = () => {
     error, 
     welcomeBack, 
     sendMessage, 
-    bustMyth 
+    bustMyth,
+    uid
   } = useMainHook();
 
   const handleSend = (text: string) => {
@@ -66,13 +69,14 @@ const App: React.FC = () => {
               <PersonaSelector selectedPersona="" onSelect={setSelectedPersona} />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 flex flex-col gap-6">
                   <ChatInterface 
                     messages={messages} 
                     isLoading={isLoading} 
                     error={error} 
                     onSendMessage={handleSend} 
                   />
+                  {uid && <FootprintTracker uid={uid} />}
                 </div>
                 <div className="md:col-span-1">
                   <div className="flex flex-col gap-4">
@@ -87,6 +91,7 @@ const App: React.FC = () => {
                       </button>
                     </div>
                     <MythBuster myths={COMMON_MYTHS} onBustMyth={handleBustMyth} />
+                    {uid && <ReductionDashboard uid={uid} />}
                   </div>
                 </div>
               </div>

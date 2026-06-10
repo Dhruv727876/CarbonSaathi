@@ -48,4 +48,8 @@ export const initializeUserSession = (): Promise<string> => {
   });
 };
 
+export const logCarbonEvent = (eventName: string, params?: Record<string, unknown>): void => {
+  if (analytics) logEvent(analytics, eventName, params);
+};
+
 export { logEvent };

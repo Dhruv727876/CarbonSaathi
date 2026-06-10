@@ -44,8 +44,22 @@ const validateMythbust = [
   }
 ];
 
+const validateEmissions = [
+  body('value')
+    .isFloat({ min: 0, max: 100000 })
+    .withMessage('Value must be a positive number under 100000'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: 'Payload validation failed.' });
+    }
+    next();
+  }
+];
+
 module.exports = {
   validateChat,
   validateMythbust,
+  validateEmissions,
   ALLOWED_PERSONAS
 };

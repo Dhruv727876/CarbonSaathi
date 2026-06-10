@@ -16,8 +16,10 @@ export const MythBuster: React.FC<MythBusterProps> = React.memo(({ myths, onBust
   return (
     <section role="region" aria-label="Climate Myth Buster Section" className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
       <h2 className="text-lg font-bold text-gray-900 mb-4">Climate Myth Buster</h2>
-      <fieldset className="space-y-4">
-        <legend className="sr-only">Select a climate myth to fact-check with CarbonSaathi</legend>
+      <fieldset aria-labelledby="myth-legend" className="space-y-4">
+        <legend id="myth-legend" className="sr-only">
+          Select a climate myth to fact-check with CarbonSaathi
+        </legend>
         <div className="grid grid-cols-1 gap-3">
           {myths.map((item) => (
             <button
