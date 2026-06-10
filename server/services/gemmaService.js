@@ -1,5 +1,10 @@
 const fetch = require('node-fetch');
 
+/**
+ * Builds a persona-specific system prompt for the AI model.
+ * @param {string} persona - The selected persona identifier.
+ * @returns {string} The constructed system prompt string.
+ */
 function buildSystemPrompt(personaId) {
   const personas = {
     innovator: "You are an Eco-Innovator focused on disruptive decarbonization, carbon capture startups, and clean tech.",
@@ -45,6 +50,12 @@ Prefix all structured breakdowns with: FOOTPRINT_ANALYSIS:
 4. Concrete Next Action: End your response with exactly ONE specific, measurable action the user can take today.`;
 }
 
+/**
+ * Executes a chat query against the NVIDIA NIM Gemma model.
+ * @param {string} systemPrompt - The system instruction prompt.
+ * @param {string} userMessage - The user's input message.
+ * @returns {Promise<string>} The AI-generated response text.
+ */
 async function executeGemmaQuery(message, personaId) {
   if (!process.env.NVIDIA_API_KEY) {
     throw new Error('NVIDIA_API_KEY is not configured in the environment.');
@@ -114,6 +125,11 @@ async function executeGemmaQuery(message, personaId) {
   }
 }
 
+/**
+ * Executes a carbon myth fact-check query against the AI model.
+ * @param {string} myth - The myth statement to fact-check.
+ * @returns {Promise<string>} The AI-generated fact-check response.
+ */
 async function executeMythBust(myth) {
   if (!process.env.NVIDIA_API_KEY) {
     throw new Error('NVIDIA_API_KEY is not configured in the environment.');
