@@ -21,7 +21,7 @@ export const FootprintTracker: React.FC<FootprintTrackerProps> = ({ uid }) => {
   const [history, setHistory] = useState<LogEntry[]>([]);
   const [status, setStatus] = useState<string>('');
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const q = query(
         collection(db, 'users', uid, 'logs'),
@@ -41,13 +41,13 @@ export const FootprintTracker: React.FC<FootprintTrackerProps> = ({ uid }) => {
     } catch (err) {
       log('Error fetching footprint logs:', err);
     }
-  };
+  }, [uid]);
 
   useEffect(() => {
     if (uid) {
       fetchHistory();
     }
-  }, [uid]);
+  }, [uid, fetchHistory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
