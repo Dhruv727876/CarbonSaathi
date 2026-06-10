@@ -1,7 +1,7 @@
 > Your AI-powered guide to tracking, auditing, and mitigating individual carbon footprints under Indian climate frameworks.
 
 [![Built for Hack2Skill Hackathon](https://img.shields.io/badge/Hack2Skill-Hackathon-orange)](https://hack2skill.com)
-[![Powered by Gemma](https://img.shields.io/badge/Powered%20by-Gemma--2--31b--it-blue)](https://ai.google.dev)
+[![Powered by Gemma](https://img.shields.io/badge/Powered%20by-Gemma--4--31b--it-blue)](https://ai.google.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Enabled-yellow)](https://firebase.google.com)
 
 ---
