@@ -1,4 +1,4 @@
-import { Persona, QuizQuestion, ActivityCategory } from '../types';
+import { Persona, ActivityCategory } from '../types';
 
 /** List of valid AI persona identifiers. */
 export const ALLOWED_PERSONAS: readonly Persona[] = [
@@ -11,13 +11,6 @@ export const ALLOWED_PERSONAS: readonly Persona[] = [
   { id: 'investor', name: 'Green Investor', role: 'Financial Planning', description: 'Calculates structural green asset returns.' },
   { id: 'debunker', name: 'Myth-Buster', role: 'Scientific Truth Verification', description: 'Deconstructs systemic climate myths.' }
 ] as const;
-
-/** Carbon action stages for user journey. */
-export const ELECTION_STAGES = {
-  PRE_ELECTION: 'pre_election',
-  ACTIVE_VOTING: 'active_voting',
-  POST_ELECTION: 'post_election'
-} as const;
 
 /** Common carbon footprint myths for fact-checking. */
 export const COMMON_MYTHS = [
@@ -77,22 +70,6 @@ export const PERSONA_SUGGESTIONS = {
     'Bust the myth that carbon offsets do not work.'
   ]
 } as const;
-
-/** User readiness assessment questions. */
-export const READINESS_QUESTIONS: readonly QuizQuestion[] = [
-  {
-    id: 'q1',
-    question: 'Do you audit appliance BEE star ratings before procurement?',
-    options: ['Yes', 'No', 'Unsure'],
-    points: 10
-  },
-  {
-    id: 'q2',
-    question: 'What is the primary mode of transportation for your daily commute?',
-    options: ['Electric Vehicle / Public Transit', 'Petrol/Diesel Car', 'Walk / Bicycle'],
-    points: 15
-  }
-] as const;
 
 /** Emission factors in kg CO₂ per unit by activity. */
 export const EMISSION_FACTORS = {

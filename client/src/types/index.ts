@@ -12,13 +12,6 @@ export interface Persona {
   description: string;
 }
 
-export type ElectionStage = 'pre_election' | 'active_voting' | 'post_election';
-
-export interface ReadinessAnswer {
-  questionId: string;
-  optionIndex: number;
-  pointsReceived: number;
-}
 
 export interface GroundingChunk {
   chunkId: string;
@@ -46,20 +39,6 @@ export interface EmissionLog {
   timestamp: number;
 }
 
-export interface QuizQuestion {
-  id: string;
-  question: string;
-  options: readonly string[];
-  points: number;
-}
-
-export interface UserProgress {
-  uid: string;
-  totalEmissionsSavedKg: number;
-  quizScore: number;
-  lastActiveTimestamp: number;
-  readinessAnswers: ReadinessAnswer[];
-}
 
 export interface ActivityCategory {
   id: string;
