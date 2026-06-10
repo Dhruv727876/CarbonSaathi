@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { db, doc, setDoc } from '../firebase';
 import { collection, query, limit, getDocs, orderBy } from 'firebase/firestore';
 import { EMISSION_FACTORS } from '../constants';
