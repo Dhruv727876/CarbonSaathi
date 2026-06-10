@@ -160,7 +160,7 @@ module.exports.api = functions.https.onRequest(app);
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-      console.log(`🚀 Server is awake and listening on port ${PORT}`);
+      process.stdout.write(`Server listening on port ${PORT}\n`);
   });
 }
 

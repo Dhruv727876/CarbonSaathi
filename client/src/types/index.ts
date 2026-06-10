@@ -60,3 +60,11 @@ export interface UserProgress {
   lastActiveTimestamp: number;
   readinessAnswers: ReadinessAnswer[];
 }
+
+export interface ActivityCategory {
+  id: string;
+  label: string;
+  unit: string;
+  emissionFactor: number;
+}
+

@@ -48,6 +48,12 @@ export const initializeUserSession = (): Promise<string> => {
   });
 };
 
+/**
+ * Logs a named analytics event to Firebase Analytics.
+ * @param eventName - The name of the event to log.
+ * @param params - Optional key-value parameters for the event.
+ * @returns void
+ */
 export const logCarbonEvent = (eventName: string, params?: Record<string, unknown>): void => {
   if (analytics) logEvent(analytics, eventName, params);
 };

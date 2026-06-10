@@ -1,4 +1,4 @@
-import { Persona, QuizQuestion } from '../types';
+import { Persona, QuizQuestion, ActivityCategory } from '../types';
 
 export const ALLOWED_PERSONAS: readonly Persona[] = [
   { id: 'innovator', name: 'Eco-Innovator', role: 'Clean Tech & Decarbonization', description: 'Focuses on disruptive technologies and green tech startups.' },
@@ -117,4 +117,12 @@ export const REDUCTION_TIPS: Record<string, string[]> = {
     "Support brands that offer circular or return-to-loop programs."
   ]
 };
+
+export const ACTIVITY_CATEGORIES: ActivityCategory[] = [
+  { id: 'transport', label: 'Car Commute', unit: 'km', emissionFactor: 0.21 },
+  { id: 'flight', label: 'Flight Travel', unit: 'km', emissionFactor: 0.255 },
+  { id: 'food', label: 'High-impact Meals', unit: 'meals', emissionFactor: 3.3 },
+  { id: 'electricity', label: 'Electricity', unit: 'kWh', emissionFactor: 0.82 },
+];
+
 

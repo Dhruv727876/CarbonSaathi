@@ -15,6 +15,11 @@ interface UseMainHookReturn {
   uid: string | null;
 }
 
+/**
+ * Primary application hook managing chat state, Firestore sync,
+ * and carbon analytics telemetry.
+ * @returns Chat state, loading state, error state, and action handlers.
+ */
 export const useMainHook = (): UseMainHookReturn => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
