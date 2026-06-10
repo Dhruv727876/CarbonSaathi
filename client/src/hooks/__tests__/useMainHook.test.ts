@@ -117,7 +117,7 @@ describe('useMainHook hook validation suite', () => {
   });
 
   it('isLoading is true during fetch and false after completion', async () => {
-    let resolvePromise: (value: unknown) => void = (_unused: unknown) => undefined;
+    let resolvePromise: (value: unknown) => void = () => undefined;
     const fetchPromise = new Promise((resolve) => {
       resolvePromise = resolve;
     });

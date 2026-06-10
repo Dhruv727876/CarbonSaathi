@@ -11,9 +11,7 @@ const MythBuster = React.lazy(() => import('./components/MythBuster').then(m => 
 const FootprintTracker = React.lazy(() => import('./components/FootprintTracker').then(m => ({ default: m.FootprintTracker })));
 const ReductionDashboard = React.lazy(() => import('./components/ReductionDashboard').then(m => ({ default: m.ReductionDashboard })));
 
-interface AppProps {}
-
-const App: React.FC<AppProps> = () => {
+const App: React.FC = () => {
   const { 
     messages, 
     selectedPersona, 
